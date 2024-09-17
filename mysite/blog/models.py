@@ -2,6 +2,11 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+# For Custom Model Manager
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=self.model.Status.PUBLISHED)
+    
 # Create your models here.
 class Post(models.Model):
     class Status(models.TextChoices):
@@ -15,6 +20,9 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.DRAFT)
+
+    objects = models.Manager()  # Default Manager (dont have to specify if no custom manager)
+    published = PublishedManager()  # Using Custom Model Manager
 
     class Meta:
         ordering = ['-publish']
